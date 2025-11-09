@@ -1,0 +1,8 @@
+name: ledger_finance_server_scripts
+description: Scripts for building and developing in configurations
+environment:
+  sdk: ^3.7.1
+dependencies:
+  stepflow:
+    path: packages/stepflow
+  path: ^1.9.1

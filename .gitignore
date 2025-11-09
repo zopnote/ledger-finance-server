@@ -1,0 +1,5 @@
+/go.sum
+/scripts/pubspec.lock
+/build/
+/.idea/
+/scripts/.dart_tool/

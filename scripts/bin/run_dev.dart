@@ -5,7 +5,7 @@ import 'package:stepflow/cli.dart';
 import 'package:stepflow/common.dart';
 
 Future<void> main(List<String> args) async {
-  print("Starting development build...");
+  print("Starting development build...\n");
   await runWorkflow(
     RunDevelopmentWorkflow(
       projectRoot: path
@@ -36,7 +36,6 @@ final class RunDevelopmentWorkflow extends ConfigureStep {
                 .listSync()
                 .where((e) => e is File)
                 .map((e) => path.basename(e.path));
-            print(files);
             return files.contains("main.go");
           }(),
           child: GoBuild(
@@ -54,7 +53,6 @@ final class RunDevelopmentWorkflow extends ConfigureStep {
                 .listSync()
                 .where((e) => e is File)
                 .map((e) => path.basename(e.path));
-            print(files);
             return files.contains("main.go");
           }(),
           child: GoBuild(
@@ -71,6 +69,20 @@ final class RunDevelopmentWorkflow extends ConfigureStep {
             directories: ["assets"],
             installPath: buildDirectory,
             binariesPath: projectRoot
+        ),
+        Runnable((context) {
+          context.send(Response("Start application...\n", Level.status));
+        }, name: "Send message"),
+        Shell(
+            name: "Execute client application",
+            program: path.join(buildDirectory, "ledge-fs${Platform.isWindows ? ".exe": ""}"),
+            arguments: [],
+          onStdout: (context, chars) {
+              context.send(Response(String.fromCharCodes(chars), Level.status));
+          },
+          onStderr: (context, chars) {
+              context.send(Response(String.fromCharCodes(chars), Level.error));
+          }
         )
       ],
     );

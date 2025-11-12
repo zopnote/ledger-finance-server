@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ledger_finance_server_scripts/go_steps.dart';
 import 'package:path/path.dart' as path;
 import 'package:stepflow/cli.dart';
 import 'package:stepflow/common.dart';
@@ -22,6 +23,28 @@ Future<void> main(List<String> args) async {
   );
 }
 
+final class BuildMainGo extends ConfigureStep {
+  BuildMainGo({required this.projectRoot, required this.outputFile});
+  final String projectRoot;
+  final String outputFile;
+  @override
+  Step configure() {
+    return Conditional(
+      condition: () {
+        final Iterable<String> files = Directory(
+          projectRoot,
+        ).listSync().where((e) => e is File).map((e) => path.basename(e.path));
+        return files.contains("main.go");
+      }(),
+      child: GoBuild(
+        projectDirectory: projectRoot,
+        outputFile: outputFile,
+        buildMode: GoBuildMode.debug,
+      ),
+    );
+  }
+}
+
 final class RunDevelopmentWorkflow extends ConfigureStep {
   RunDevelopmentWorkflow({required this.projectRoot});
   final String projectRoot;
@@ -30,113 +53,42 @@ final class RunDevelopmentWorkflow extends ConfigureStep {
     final String buildDirectory = path.join(projectRoot, "build", "dev");
     return Chain(
       steps: [
-        Conditional(
-          condition: () {
-            final Iterable<String> files = Directory(projectRoot)
-                .listSync()
-                .where((e) => e is File)
-                .map((e) => path.basename(e.path));
-            return files.contains("main.go");
-          }(),
-          child: GoBuild(
-            projectDirectory: projectRoot,
-            outputFile: path.join(
-              buildDirectory,
-              "ledge-fs${Platform.isWindows ? ".exe" : ""}",
-            ),
-            buildMode: GoBuildMode.debug,
+        BuildMainGo(
+          projectRoot: projectRoot,
+          outputFile: path.join(
+            buildDirectory,
+            "ledge-fs${Platform.isWindows ? ".exe" : ""}",
           ),
         ),
-        Conditional(
-          condition: () {
-            final Iterable<String> files = Directory(path.join(projectRoot, "server"))
-                .listSync()
-                .where((e) => e is File)
-                .map((e) => path.basename(e.path));
-            return files.contains("main.go");
-          }(),
-          child: GoBuild(
-            projectDirectory: path.join(projectRoot, "server"),
-            outputFile: path.join(
-              buildDirectory,
-              "server${Platform.isWindows ? ".exe" : ""}",
-            ),
-            buildMode: GoBuildMode.debug,
+        BuildMainGo(
+          projectRoot: path.join(projectRoot, "server"),
+          outputFile: path.join(
+            buildDirectory,
+            "server${Platform.isWindows ? ".exe" : ""}",
           ),
         ),
         Install(
-            name: "Install resources",
-            directories: ["assets"],
-            installPath: buildDirectory,
-            binariesPath: projectRoot
+          name: "Install resources",
+          directories: ["assets"],
+          installPath: buildDirectory,
+          binariesPath: projectRoot,
         ),
         Runnable((context) {
           context.send(Response("Start application...\n", Level.status));
         }, name: "Send message"),
         Shell(
-            name: "Execute client application",
-            program: path.join(buildDirectory, "ledge-fs${Platform.isWindows ? ".exe": ""}"),
-            arguments: [],
-          onStdout: (context, chars) {
-              context.send(Response(String.fromCharCodes(chars), Level.status));
-          },
-          onStderr: (context, chars) {
-              context.send(Response(String.fromCharCodes(chars), Level.error));
-          }
-        )
-      ],
-    );
-  }
-}
-
-enum GoBuildMode { release, debug }
-
-class GoBuild extends ConfigureStep {
-  const GoBuild({
-    required this.projectDirectory,
-    required this.outputFile,
-    required this.buildMode,
-    this.goExecutable,
-  });
-
-  final String projectDirectory;
-  final String outputFile;
-  final GoBuildMode buildMode;
-  final String? goExecutable;
-
-  @override
-  Step configure() {
-    return Chain(
-      steps: [
-        Conditional(
-          condition: goExecutable == null,
-          child: Check(
-            name: "Check for installed Go distribution",
-            programs: ["go"],
-            onFailure: (context, _) {
-              context.pop("Go isn't installed on the system.");
-            },
+          name: "Execute client application",
+          program: path.join(
+            buildDirectory,
+            "ledge-fs${Platform.isWindows ? ".exe" : ""}",
           ),
-        ),
-        Shell(
-          name: "Compile Go source code",
-          program: "go",
-          arguments: () {
-            List<String> arguments = ["build", "-o", outputFile];
-            if (buildMode == GoBuildMode.release) {
-              arguments += ["-ldflags", "-s", "-w"];
-            }
-            return arguments += ["."];
-          }(),
-          workingDirectory: projectDirectory,
-          onStderr: (context, chars) {
-            context.send(Response(String.fromCharCodes(chars), Level.critical));
-          },
+          arguments: [],
           onStdout: (context, chars) {
-            context.send(Response(String.fromCharCodes(chars), Level.verbose));
+            context.send(Response(String.fromCharCodes(chars), Level.status));
           },
-          runAsAdministrator: false,
-          runInShell: false,
+          onStderr: (context, chars) {
+            context.send(Response(String.fromCharCodes(chars), Level.error));
+          },
         ),
       ],
     );

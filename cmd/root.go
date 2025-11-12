@@ -7,7 +7,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "ledserv",
+	Use:   "ledge-fs",
 	Short: "A backend server with the purpose of ledgement.",
 	Long: "A ledger server for storing, managing and processing financial data about td-services." +
 		" The website is available under https://www.tdls-del.de",

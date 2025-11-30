@@ -21,13 +21,14 @@
 
 ## HTTP-Interface
 
-| Pfad            | Beschreibung                              |
-|-----------------|-------------------------------------------|
-| /               | Root (html doc)                           |
-| status/         | Status Informationen                      |
-| book/           | Geschäftsvorfall buchen                   |
-| book-order/     | Verkaufte Artikel buchen                  |
-| retrieve-order/ | Informationen zu einer Buchung erhalten   |
-| manage-item/    | Einen Artikel bearbeiten                  |
-| retrieve-item/  | Informationen über einen Artikel erhalten |
+| Pfad (api/-prefixed) | Beschreibung                              |
+|----------------------|-------------------------------------------|
+| /                    | Root (html doc)                           |
+| status/              | Status Informationen                      |
+| book/                | Geschäftsvorfall buchen                   |
+| retrieve-booked/     | Informationen zu einer Buchung erhalten   |
+| list-booked/         | Buchungen aufführen                       |
+| manage-item/         | Einen Artikel bearbeiten                  |
+| retrieve-item/       | Informationen über einen Artikel erhalten |
+| list-items/          | Alle registrierten Artikel aufführen      |
 

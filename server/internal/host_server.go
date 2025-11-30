@@ -1,33 +1,38 @@
 package internal
 
 import (
-	http2 "ledger-finance-server/server/internal/http"
+	"fmt"
+	server "ledger-finance-server/server/internal/paths"
 	"log"
 	"net/http"
 	"time"
 )
 
-var tries = 0
+var Tries = 0
 
 func StartServer() {
-	http.Handle("/api/", http.StripPrefix("/api/", http.FileServer(http.Dir("./web"))))
-	http.HandleFunc("/api/manage-item/", http2.ManageItem)
-	http.HandleFunc("/manage-item/", http2.ManageItem)
-	http.HandleFunc("/manage-item/", http2.ManageItem)
-	http.HandleFunc("/manage-item/", http2.ManageItem)
+	prefix := "/api"
+	root := fmt.Sprintf("%s/", prefix)
+	http.Handle(
+		root,
+		http.StripPrefix(root, http.FileServer(http.Dir("./web"))))
+	http.HandleFunc(fmt.Sprintf("%s/status", prefix), server.Status)
+	http.HandleFunc(fmt.Sprintf("%s/book", prefix), server.Book)
+	http.HandleFunc(fmt.Sprintf("%s/retrieve-booked", prefix), server.Status)
+	http.HandleFunc(fmt.Sprintf("%s/list-booked", prefix), server.Status)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		if tries > 5 {
+		if Tries > 5 {
 			log.Fatal("An fatal error occurred. " +
-				"To many tries to restart http, the application will now be closed.")
+				"To many Tries to restart paths, the application will now be closed.")
 		}
-		log.Print("An error occurred while the start up of http. " +
+		log.Print("An error occurred while the start up of paths. " +
 			"Try again in 5 seconds...")
-		tries++
+		Tries++
 		time.Sleep(time.Second * 5)
 		StartServer()
 		return
 	}
-	tries = 0
+	Tries = 0
 }

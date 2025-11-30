@@ -1,4 +1,4 @@
-package http
+package paths
 
 import "net/http"
 

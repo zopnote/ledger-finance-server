@@ -11,7 +11,11 @@ var tries = 0
 
 func StartServer() {
 	http.Handle("/api/", http.StripPrefix("/api/", http.FileServer(http.Dir("./web"))))
+	http.HandleFunc("/api/manage-item/", http2.ManageItem)
 	http.HandleFunc("/manage-item/", http2.ManageItem)
+	http.HandleFunc("/manage-item/", http2.ManageItem)
+	http.HandleFunc("/manage-item/", http2.ManageItem)
+
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		if tries > 5 {

@@ -1,0 +1,51 @@
+
+# type: 0 = passive
+# type: 1 = active
+# type: 2 = yield
+
+accounts:
+  - name: "Betriebs- & Gewerbeausstattung"
+    id: 0630
+    type: 1
+  - name: "Geringwertige Wirtschaftsgüter"
+    id: 0670
+    type: 1
+  - name: "Rohwaren"
+    id: 1000
+    type: 1
+  - name: "Fertigwaren"
+    id: 1100
+    type: 1
+  - name: "Forderungen"
+    id: 1200
+    type: 1
+  - name: "Bank"
+    id: 1700
+    type: 1
+  - name: "Kasse"
+    id: 1701
+    type: 1
+  - name: "Privatentnahmen"
+    id: 1800
+    type: 2
+  - name: "Privateinlagen"
+    id: 1891
+    type: 2
+  - name: "Eigenkapital"
+    id: 2001
+    type: 0
+  - name: "Verbindlichkeiten"
+    id: 3300
+    type: 0
+  - name: "Verbindlichkeiten gegenüber Finanzamt"
+    id: 3500
+    type: 0
+  - name: "Aufwendungen"
+    id: 4900
+    type: 2
+  - name: "Abschreibungen"
+    id: 6260
+    type: 1
+  - name: "Erträge"
+    id: 7000
+    type: 2

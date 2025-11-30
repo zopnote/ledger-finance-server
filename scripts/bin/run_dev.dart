@@ -6,7 +6,7 @@ import 'package:stepflow/cli.dart';
 import 'package:stepflow/common.dart';
 
 Future<void> main(List<String> args) async {
-  print("Starting development build...\n");
+  print("Start development build...\n");
   await runWorkflow(
     RunDevelopmentWorkflow(
       projectRoot: path
@@ -69,7 +69,7 @@ final class RunDevelopmentWorkflow extends ConfigureStep {
         ),
         Install(
           name: "Install resources",
-          directories: ["assets"],
+          directories: ["assets", "config", "web"],
           installPath: buildDirectory,
           binariesPath: projectRoot,
         ),

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"ledger-finance-server/server/internal/data"
 	"net/http"
 	"os"
 	"time"
@@ -19,6 +20,7 @@ func ServeHttp(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 
+	data.RetrieveAccounts()
 	http.HandleFunc("", ServeHttp)
 	err := http.ListenAndServe(":3030", nil)
 
